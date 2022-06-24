@@ -1,0 +1,8 @@
+[Bb]in
+[Oo]bj
+*.keystore
+*.b64
+
+*.apk
+*.aab
+*.ipa
