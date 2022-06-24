@@ -1,0 +1,73 @@
+name: Maui App CI
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '30 12 * * *'
+    - cron:  '30 15 * * *'
+    - cron:  '30 18 * * *'
+    - cron:  '30 21 * * *'
+  workflow_dispatch:
+
+jobs:
+  android:
+    runs-on: macos-12
+    name: Android App CI
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 6.0.x
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Install .NET Workload
+        run: dotnet workload install maui
+
+      - name: Install Nerdbank GitVersioning
+        run: dotnet tool install -g nbgv
+
+      - name: Get Keystore
+        shell: pwsh
+        run: |
+          $keystore = "${{ secrets.ANDROID_KEYSTORE_B64 }}"
+          [IO.File]::WriteAllBytes("${{ secrets.ANDROID_KEYSTORE_NAME }}.keystore",	([convert]::FromBase64String($keystore)))
+
+      - name: NuGet Restore
+        run: dotnet restore MauiCIDemo.sln
+
+      - name: Build Packages
+        shell: pwsh
+        run: |
+          $version = nbgv get-version -v NuGetPackageVersion
+          $buildCode = [DateTimeOffset]::Now.ToUnixTimeSeconds() - 1656042000
+          $keystore = Join-Path -Path pwd -ChildPath "${{ secrets.ANDROID_KEYSTORE_NAME }}.keystore"
+          $keystorePassword = "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+          dotnet publish -f:net6.0-android -c:Release --output publish /p:AndroidSigningKeyPass=$keystorePassword /p:AndroidSigningStorePass=$keystorePassword /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_KEYSTORE_NAME }} /p:AndroidSigningKeyStore=$keystore /p:ApplicationDisplayVersion=$version /p:ApplicationVersion=$buildCode
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: android
+          path: publish
+
+  ios:
+    runs-on: macos-12
+    name: iOS App CI
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 6.0.x
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Install .NET Workload
+        run: dotnet workload install maui
+
+      - name: NuGet Restore
+        run: dotnet restore MauiCIDemo.sln
