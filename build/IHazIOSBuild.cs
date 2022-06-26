@@ -22,6 +22,7 @@ public interface IHazIOSBuild :
             DotNetTasks.DotNetPublish(settings =>
                 settings.SetConfiguration(Configuration)
                     .SetFramework("net6.0-ios")
+                    .AddProperty("ArchiveOnBuild", true)
                     .AddProperty("ApplicationDisplayVersion", Versioning.NuGetPackageVersion)
                     .AddProperty("ApplicationVersion", DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 1656042000)
                     .SetOutput(ArtifactsDirectory));

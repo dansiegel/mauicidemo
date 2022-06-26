@@ -55,7 +55,7 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
         using var client = new HttpClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateToken());
         var responseTask = client.GetAsync("https://api.appstoreconnect.apple.com/v1/profiles");
-        responseTask.RunSynchronously();
+        responseTask.Wait();
         using var response = responseTask.Result;
         Assert.True(response.IsSuccessStatusCode, "Unable to retrieve Apple Provisioning Profiles");
 

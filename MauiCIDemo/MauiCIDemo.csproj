@@ -15,7 +15,7 @@
     <ApplicationTitle>MauiCIDemo</ApplicationTitle>
 
     <!-- App Identifier -->
-    <ApplicationId>com.companyname.mauicidemo</ApplicationId>
+    <ApplicationId>com.avantipoint.mauicidemo</ApplicationId>
     <ApplicationIdGuid>f96e7bf6-2b3e-4b81-96cf-79ec01bea697</ApplicationIdGuid>
 
     <!-- Versions -->
