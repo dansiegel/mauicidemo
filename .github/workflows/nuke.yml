@@ -1,0 +1,60 @@
+name: Nuke Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-ios:
+    name: Build iOS
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Cache .nuke/temp, ~/.nuget/packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            .nuke/temp
+            ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+      - name: Run './build.cmd CompileIos'
+        run: ./build.cmd CompileIos
+        env:
+          IOS_P12_B64: ${{ secrets.IOS_P12_B64 }}
+          IOS_P12_Password: ${{ secrets.IOS_P12_PASSWORD }}
+          Apple_IssuerId: ${{ secrets.APPLE_ISSUER_ID }}
+          Apple_KeyId: ${{ secrets.APPLE_KEY_ID }}
+          Apple_AuthKey_P8: ${{ secrets.APPLE_AUTH_KEY_P8 }}
+          Apple_ProfileId: ${{ secrets.APPLE_PROFILE_ID }}
+      - uses: actions/upload-artifact@v1
+        with:
+          name: ios
+          path: artifacts
+
+  build-android:
+    name: Build Android
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Cache .nuke/temp, ~/.nuget/packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            .nuke/temp
+            ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+      - name: Run './build.cmd CompileAndroid'
+        run: ./build.cmd CompileAndroid
+        env:
+          ANDROID_KEYSTORE_NAME: ${{ secrets.ANDROID_KEYSTORE_NAME }}
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      - uses: actions/upload-artifact@v1
+        with:
+          name: android
+          path: artifacts

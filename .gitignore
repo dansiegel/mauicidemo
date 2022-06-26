@@ -6,3 +6,6 @@
 *.apk
 *.aab
 *.ipa
+
+.nuke/temp/
+.idea/
