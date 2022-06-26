@@ -9,7 +9,7 @@ using Nuke.Common.CI.GitHubActions;
     AutoGenerate = true,
     OnPushBranches = new [] { MasterBranch },
     InvokedTargets = new [] { nameof(IHazAndroidBuild.CompileAndroid) },
-    ImportSecrets = new [] { nameof(IHazAndroidKeystore.ANDROID_KEYSTORE_NAME), nameof(IHazAndroidKeystore.ANDROID_KEYSTORE_B64), nameof(IHazAndroidKeystore.ANDROID_KEYSTORE_PASSWORD)}
+    ImportSecrets = new [] { nameof(IHazAndroidKeystore.Android_Keystore_Name), nameof(IHazAndroidKeystore.Android_Keystore_B64), nameof(IHazAndroidKeystore.Android_Keystore_Password)}
     )]
 [GitHubActions("ios-build",
     GitHubActionsImage.MacOsLatest,

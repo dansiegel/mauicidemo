@@ -6,15 +6,15 @@
     "build": {
       "type": "object",
       "properties": {
-        "ANDROID_KEYSTORE_B64": {
+        "Android_Keystore_B64": {
           "type": "string",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "ANDROID_KEYSTORE_NAME": {
+        "Android_Keystore_Name": {
           "type": "string",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "ANDROID_KEYSTORE_PASSWORD": {
+        "Android_Keystore_Password": {
           "type": "string",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },

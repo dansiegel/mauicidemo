@@ -8,23 +8,23 @@ using Nuke.Common.IO;
 public interface IHazAndroidKeystore : INukeBuild
 {
     [Parameter, Secret]
-    string ANDROID_KEYSTORE_B64 => TryGetValue(() => ANDROID_KEYSTORE_B64);
+    string Android_Keystore_B64 => TryGetValue(() => Android_Keystore_B64);
 
     [Parameter, Secret]
-    string ANDROID_KEYSTORE_NAME => TryGetValue(() => ANDROID_KEYSTORE_NAME);
+    string Android_Keystore_Name => TryGetValue(() => Android_Keystore_Name);
 
     [Parameter, Secret]
-    string ANDROID_KEYSTORE_PASSWORD => TryGetValue(() => ANDROID_KEYSTORE_PASSWORD);
+    string Android_Keystore_Password => TryGetValue(() => Android_Keystore_Password);
 
-    AbsolutePath KeystorePath => (AbsolutePath) Path.Combine(EnvironmentInfo.WorkingDirectory, $"{ANDROID_KEYSTORE_NAME}");
+    AbsolutePath KeystorePath => (AbsolutePath) Path.Combine(EnvironmentInfo.WorkingDirectory, $"{Android_Keystore_Name}.keystore");
 
     Target RestoreKeystore => _ => _
         .Executes(() =>
         {
-            ANDROID_KEYSTORE_B64.NotNullOrEmpty("The Android KeyStore Must be available as a Base64 encoded string.");
-            ANDROID_KEYSTORE_NAME.NotNullOrEmpty("The Android KeyStore Name is required.");
+            Android_Keystore_B64.NotNullOrEmpty("The Android KeyStore Must be available as a Base64 encoded string.");
+            Android_Keystore_Name.NotNullOrEmpty("The Android KeyStore Name is required.");
 
-            var contents = Encoding.Default.GetBytes(ANDROID_KEYSTORE_B64!);
+            var contents = Encoding.Default.GetBytes(Android_Keystore_B64!);
             File.WriteAllBytes(KeystorePath, contents);
         });
 }

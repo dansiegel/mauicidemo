@@ -59,9 +59,9 @@ jobs:
       - name: Run './build.cmd CompileAndroid'
         run: ./build.cmd CompileAndroid
         env:
-          ANDROID_KEYSTORE_NAME: ${{ secrets.ANDROID_KEYSTORE_NAME }}
-          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          Android_Keystore_Name: ${{ secrets.ANDROID_KEYSTORE_NAME }}
+          Android_Keystore_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          Android_Keystore_Password: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       - uses: actions/upload-artifact@v1
         with:
           name: android

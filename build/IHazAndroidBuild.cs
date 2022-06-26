@@ -1,6 +1,4 @@
 using System;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.Tools.DotNet;
@@ -24,9 +22,9 @@ public interface IHazAndroidBuild :
             DotNetPublish(settings =>
                 settings.SetConfiguration(Configuration)
                     .SetFramework("net6.0-android")
-                    .AddProperty("AndroidSigningKeyPass", ANDROID_KEYSTORE_PASSWORD)
-                    .AddProperty("AndroidSigningStorePass", ANDROID_KEYSTORE_PASSWORD)
-                    .AddProperty("AndroidSigningKeyAlias", ANDROID_KEYSTORE_NAME)
+                    .AddProperty("AndroidSigningKeyPass", Android_Keystore_Password)
+                    .AddProperty("AndroidSigningStorePass", Android_Keystore_Password)
+                    .AddProperty("AndroidSigningKeyAlias", Android_Keystore_Name)
                     .AddProperty("AndroidSigningKeyStore", KeystorePath)
                     .AddProperty("ApplicationDisplayVersion", $"{Versioning.VersionMajor}.{Versioning.VersionMinor}.{Versioning.VersionRevision}")
                     .AddProperty("ApplicationVersion", DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 1656042000)
