@@ -57,7 +57,7 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
         var responseTask = client.GetAsync("https://api.appstoreconnect.apple.com/v1/profiles");
         responseTask.Wait();
         using var response = responseTask.Result;
-        Assert.True(response.IsSuccessStatusCode, "Unable to retrieve Apple Provisioning Profiles");
+        Assert.True(response.IsSuccessStatusCode, $"Unable to retrieve Apple Provisioning Profiles - ({response.StatusCode}) {response.ReasonPhrase}");
 
         using var contentStream = response.Content.ReadAsStream();
         var profileResponse = JsonSerializer.Deserialize<GetProfileResponse>(contentStream);
@@ -82,9 +82,9 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
             Issuer = Apple_IssuerId,
             Audience = "appstoreconnect-v1",
             NotBefore = now,
-            Expires = now.AddMinutes(1),
+            Expires = now.AddMinutes(20),
             IssuedAt = now,
-            Claims = new Dictionary<string, object> { { "scope", new [] { "GET /v1/profiles" } } },
+            // Claims = new Dictionary<string, object> { { "scope", new [] { "GET /v1/profiles" } } },
             SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(key) { KeyId = Apple_KeyId }, "ES256")
         });
     }
