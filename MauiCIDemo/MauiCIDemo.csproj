@@ -48,8 +48,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.191-beta" />
-    <PackageReference Include="Prism.Maui.Rx" Version="8.1.241-beta" />
+    <PackageReference Include="Prism.DryIoc.Maui" Version="8.1.228-beta" />
+    <PackageReference Include="Prism.Maui.Rx" Version="8.1.228-beta" />
   </ItemGroup>
 
 </Project>
