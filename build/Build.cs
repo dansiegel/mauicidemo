@@ -1,7 +1,8 @@
-using System;
+using System.Reflection;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.CI.GitHubActions;
+using Nuke.Common.Utilities.Collections;
 
 [GitHubActions("android-build",
     GitHubActionsImage.MacOsLatest,
@@ -37,4 +38,26 @@ class Build : NukeBuild,
 
     [CI]
     readonly GitHubActions GitHubActions;
+
+    protected override void WriteLogo()
+    {
+        Debug();
+        new[]
+        {
+            "░█████╗░██╗░░░██╗░█████╗░███╗░░██╗████████╗██╗██████╗░░█████╗░██╗███╗░░██╗████████╗",
+            "██╔══██╗██║░░░██║██╔══██╗████╗░██║╚══██╔══╝██║██╔══██╗██╔══██╗██║████╗░██║╚══██╔══╝",
+            "███████║╚██╗░██╔╝███████║██╔██╗██║░░░██║░░░██║██████╔╝██║░░██║██║██╔██╗██║░░░██║░░░",
+            "██╔══██║░╚████╔╝░██╔══██║██║╚████║░░░██║░░░██║██╔═══╝░██║░░██║██║██║╚████║░░░██║░░░",
+            "██║░░██║░░╚██╔╝░░██║░░██║██║░╚███║░░░██║░░░██║██║░░░░░╚█████╔╝██║██║░╚███║░░░██║░░░",
+            "╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚══╝░░░╚═╝░░░╚═╝╚═╝░░░░░░╚════╝░╚═╝╚═╝░░╚══╝░░░╚═╝░░░",
+        }.ForEach(x => Debug(x));
+        Debug();
+    }
+
+    private void Debug(string text = null)
+    {
+        var hostType = typeof(Nuke.Common.Host);
+        var method = hostType.GetMethod("Debug", BindingFlags.Static | BindingFlags.NonPublic);
+        method.Invoke(null, new[] {text});
+    }
 }
