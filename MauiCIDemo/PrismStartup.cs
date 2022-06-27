@@ -7,6 +7,12 @@ internal static class PrismStartup
     public static void Configure(PrismAppBuilder builder)
     {
         builder.RegisterTypes(RegisterTypes)
+            .AddGlobalNavigationObserver((c,o) =>
+                o.Subscribe(context =>
+                {
+                    if (!context.Result.Success && !context.Cancelled)
+                        Console.WriteLine(context.Result.Exception);
+                }))
                 .OnAppStart("NavigationPage/MainPage");
     }
 
