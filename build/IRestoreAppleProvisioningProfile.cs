@@ -11,23 +11,30 @@ using JetBrains.Annotations;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Nuke.Common;
+using Nuke.Components;
 
 [PublicAPI]
 public interface IRestoreAppleProvisioningProfile : INukeBuild
 {
-    [Parameter, Secret]
+    [Parameter("Apple Issuer Id is required"), Secret]
     string Apple_IssuerId => TryGetValue(() => Apple_IssuerId);
 
-    [Parameter,Secret]
+    [Parameter("Apple Key Id is required"),Secret]
     string Apple_KeyId => TryGetValue(() => Apple_KeyId);
 
-    [Parameter,Secret]
+    [Parameter("Apple AuthKey P8 text value"),Secret]
     string Apple_AuthKey_P8 => TryGetValue(() => Apple_AuthKey_P8);
 
-    [Parameter,Secret]
+    [Parameter("Apple Profile Id is required"),Secret]
     string Apple_ProfileId => TryGetValue(() => Apple_ProfileId);
 
     Target DownloadProvisioningProfile => _ => _
+        .TryBefore<IRestore>()
+        .TryBefore<IHazMauiWorkload>()
+        .Requires(() => Apple_IssuerId)
+        .Requires(() => Apple_KeyId)
+        .Requires(() => Apple_ProfileId)
+        .Requires(() => Apple_AuthKey_P8)
         .Executes(() =>
         {
             var profileResponse = GetProvisioningProfiles();

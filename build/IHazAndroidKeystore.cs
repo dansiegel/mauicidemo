@@ -3,27 +3,30 @@ using System.Text;
 using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.IO;
+using Nuke.Components;
 
 [PublicAPI]
 public interface IHazAndroidKeystore : INukeBuild
 {
-    [Parameter, Secret]
+    [Parameter("Android KeyStore must be Base64 Encoded"), Secret]
     string Android_Keystore_B64 => TryGetValue(() => Android_Keystore_B64);
 
-    [Parameter, Secret]
+    [Parameter("Android KeyStore name must be provided"), Secret]
     string Android_Keystore_Name => TryGetValue(() => Android_Keystore_Name);
 
-    [Parameter, Secret]
+    [Parameter("Android KeyStore must be provided"), Secret]
     string Android_Keystore_Password => TryGetValue(() => Android_Keystore_Password);
 
     AbsolutePath KeystorePath => (AbsolutePath) Path.Combine(EnvironmentInfo.WorkingDirectory, $"{Android_Keystore_Name}.keystore");
 
     Target RestoreKeystore => _ => _
+        .TryBefore<IRestore>()
+        .TryBefore<IHazMauiWorkload>()
+        .Requires(() => Android_Keystore_B64)
+        .Requires(() => Android_Keystore_Name)
+        .Requires(() => Android_Keystore_Password)
         .Executes(() =>
         {
-            Android_Keystore_B64.NotNullOrEmpty("The Android KeyStore Must be available as a Base64 encoded string.");
-            Android_Keystore_Name.NotNullOrEmpty("The Android KeyStore Name is required.");
-
             var contents = Encoding.Default.GetBytes(Android_Keystore_B64!);
             File.WriteAllBytes(KeystorePath, contents);
         });

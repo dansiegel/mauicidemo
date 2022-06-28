@@ -8,30 +8,37 @@
       "properties": {
         "Android_Keystore_B64": {
           "type": "string",
+          "description": "Android KeyStore must be Base64 Encoded",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Android_Keystore_Name": {
           "type": "string",
+          "description": "Android KeyStore name must be provided",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Android_Keystore_Password": {
           "type": "string",
+          "description": "Android KeyStore must be provided",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Apple_AuthKey_P8": {
           "type": "string",
+          "description": "Apple AuthKey P8 text value",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Apple_IssuerId": {
           "type": "string",
+          "description": "Apple Issuer Id is required",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Apple_KeyId": {
           "type": "string",
+          "description": "Apple Key Id is required",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Apple_ProfileId": {
           "type": "string",
+          "description": "Apple Profile Id is required",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Configuration": {
@@ -77,10 +84,12 @@
         },
         "IOS_P12_B64": {
           "type": "string",
+          "description": "iOS P12 Certificate must be Base64 Encoded",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "IOS_P12_Password": {
           "type": "string",
+          "description": "iOS P12 Certificate must be provided",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "NoLogo": {

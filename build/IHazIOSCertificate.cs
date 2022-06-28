@@ -4,14 +4,15 @@ using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
+using Nuke.Components;
 
 [PublicAPI]
 public interface IHazIOSCertificate : INukeBuild
 {
-    [Parameter,Secret]
+    [Parameter("iOS P12 Certificate must be Base64 Encoded"),Secret]
     string IOS_P12_B64 => TryGetValue(() => IOS_P12_B64);
 
-    [Parameter,Secret]
+    [Parameter("iOS P12 Certificate must be provided"),Secret]
     string IOS_P12_Password => TryGetValue(() => IOS_P12_Password);
 
     [PathExecutable("security")]
@@ -20,12 +21,12 @@ public interface IHazIOSCertificate : INukeBuild
     AbsolutePath P12CertifiatePath => (AbsolutePath) Path.Combine(EnvironmentInfo.WorkingDirectory, "apple.p12");
 
     Target RestoreIOSCertificate => _ => _
+        .TryBefore<IRestore>()
+        .TryBefore<IHazMauiWorkload>()
+        .Requires(() => IOS_P12_B64)
+        .Requires(() => IOS_P12_Password)
         .Executes(() =>
         {
-            IOS_P12_B64.NotNullOrEmpty(
-                "iOS Development Certificate required. No value found for the Base64 encoded certificate.");
-            IOS_P12_Password.NotNullOrEmpty("No iOS P12 Certificate Password provided.");
-
             var data = Convert.FromBase64String(IOS_P12_B64);
             File.WriteAllBytes(P12CertifiatePath, data);
 

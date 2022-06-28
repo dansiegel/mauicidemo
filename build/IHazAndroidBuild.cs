@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Linq;
 using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.Tools.DotNet;
@@ -16,7 +18,7 @@ public interface IHazAndroidBuild :
 {
     Target CompileAndroid => _ => _
         .DependsOn(RestoreKeystore, InstallWorkload, Restore)
-        .Produces(ArtifactsDirectory / "*-Signed.apk", ArtifactsDirectory / "*-Signed.aab")
+        .Produces(ArtifactsDirectory)
         .Executes(() =>
         {
             DotNetPublish(settings =>
@@ -29,5 +31,8 @@ public interface IHazAndroidBuild :
                     .AddProperty("ApplicationDisplayVersion", $"{Versioning.VersionMajor}.{Versioning.VersionMinor}.{Versioning.VersionRevision}")
                     .AddProperty("ApplicationVersion", DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 1656042000)
                     .SetOutput(ArtifactsDirectory));
+
+            Assert.True(Directory.EnumerateFiles(ArtifactsDirectory, "*-Signed.apk").Any(), "No Signed APK was found in the output directory");
+            Assert.True(Directory.EnumerateFiles(ArtifactsDirectory, "*-Signed.aab").Any(), "No Signed AAB was found in the output directory");
         });
 }
