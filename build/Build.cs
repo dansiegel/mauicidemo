@@ -5,7 +5,7 @@ using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Utilities.Collections;
 
 [GitHubActions("android-build",
-    GitHubActionsImage.MacOsLatest,
+    GitHubActionsImage.WindowsLatest,
     FetchDepth = 0,
     AutoGenerate = true,
     OnPushBranches = new [] { MasterBranch },

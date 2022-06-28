@@ -8,7 +8,7 @@ on:
 jobs:
   build-ios:
     name: Build iOS
-    runs-on: macOS-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -40,7 +40,7 @@ jobs:
 
   build-android:
     name: Build Android
-    runs-on: macOS-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
