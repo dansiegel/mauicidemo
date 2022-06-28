@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using AppStoreConnect;
 using JetBrains.Annotations;
@@ -54,6 +55,8 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
                     $"{profile.Attributes.Uuid}.mobileprovision");
                 var data = Convert.FromBase64String(profile.Attributes.ProfileContent);
                 File.WriteAllBytes(filePath, data);
+                Serilog.Log.Information(messageTemplate: "Downloaded Provisioning Profile: {0}", propertyValue: profile.Attributes.Name);
+                Serilog.Log.Information(File.ReadAllText(filePath));
             }
         });
 
@@ -74,13 +77,10 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
 
     string GenerateToken()
     {
-        Apple_KeyId.NotNullOrEmpty("The Apple KeyId is required");
-        Apple_IssuerId.NotNullOrEmpty("The Apple IssuerId is required");
-        Apple_AuthKey_P8.NotNullOrEmpty("The Apple AuthKey P8 Contents are required");
-
+        var p8 = Encoding.Default.GetString(Convert.FromBase64String(Apple_AuthKey_P8));
         var key = ECDsa.Create();
         key.NotNull("Unable to create ECDsa Key");
-        key.ImportFromPem(Apple_AuthKey_P8.AsSpan());
+        key.ImportFromPem(p8.AsSpan());
 
         var now = DateTime.UtcNow;
 
