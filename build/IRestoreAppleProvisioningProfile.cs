@@ -57,11 +57,19 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
             foreach (var profile in profiles)
             {
                 // "$HOME/Library/MobileDevice/Provisioning Profiles/${UUID}.mobileprovision"
-                var filePath = Path.Combine(
+                var profilesDirectory = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     "Library",
                     "MobileDevice",
-                    "Provisioning Profiles",
+                    "Provisioning Profiles");
+                if (!Directory.Exists(profilesDirectory))
+                {
+                    Log.Information($"Creating Provisioning Profiles Directory: '{profilesDirectory}'.");
+                    Directory.CreateDirectory(profilesDirectory);
+                }
+
+                var filePath = Path.Combine(
+                    profilesDirectory,
                     $"{profile.Attributes.Uuid}.mobileprovision");
                 var data = Convert.FromBase64String(profile.Attributes.ProfileContent);
                 File.WriteAllBytes(filePath, data);

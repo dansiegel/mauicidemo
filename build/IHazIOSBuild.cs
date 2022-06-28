@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Components;
+using Serilog;
 
 [PublicAPI]
 public interface IHazIOSBuild :
@@ -14,23 +15,24 @@ public interface IHazIOSBuild :
     IHazMauiWorkload,
     IHazNerdbankGitVersioning
 {
-    [Parameter] bool EnableAssemblyILStripping => TryGetValue<bool>(() => EnableAssemblyILStripping);
     Target CompileIos => _ => _
         .OnlyWhenStatic(() => EnvironmentInfo.Platform == PlatformFamily.OSX)
         .DependsOn(RestoreIOSCertificate, DownloadProvisioningProfile, InstallWorkload, Restore)
-        .Produces(ArtifactsDirectory)
+        .Produces(ArtifactsDirectory / "*.ipa")
         .Executes(() =>
         {
+            var buildVersion = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 1656042000;
+            var displayVersion = Versioning.NuGetPackageVersion;
+
+            Log.Information($"Display Version: {displayVersion}");
+            Log.Information($"Build Version: {buildVersion}");
             DotNetTasks.DotNetPublish(settings =>
                 settings.SetConfiguration(Configuration)
                     .SetFramework("net6.0-ios")
-                    .AddProperty("EnableAssemblyILStripping", EnableAssemblyILStripping)
-                    .AddProperty("BuildIpa", true)
+                    .AddProperty("IsPublishing", true)
                     .AddProperty("ArchiveOnBuild", true)
                     .AddProperty("ApplicationDisplayVersion", Versioning.NuGetPackageVersion)
-                    .AddProperty("ApplicationVersion", DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 1656042000)
-                    .SetOutput(ArtifactsDirectory)
-                    .SetDeterministic(!IsLocalBuild)
-                    .SetVerbosity(DotNetVerbosity.Normal));
+                    .AddProperty("ApplicationVersion", buildVersion)
+                    .SetOutput(ArtifactsDirectory));
         });
 }
