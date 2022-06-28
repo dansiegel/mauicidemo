@@ -12,7 +12,9 @@ using JetBrains.Annotations;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Nuke.Common;
+using Nuke.Common.Utilities.Collections;
 using Nuke.Components;
+using Serilog;
 
 [PublicAPI]
 public interface IRestoreAppleProvisioningProfile : INukeBuild
@@ -45,7 +47,11 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
                     x.Attributes.ProfileState == ProfileState.ACTIVE && x.Id == Apple_ProfileId)
                 .ToArray();
             if(!profiles.Any())
+            {
+                profileResponse.Data.ForEach(x =>
+                    Log.Information($"Profile: {x.Attributes.Name} ({x.Attributes.ProfileType} - {x.Attributes.ProfileState})"));
                 Assert.Fail($"Profiles:\n{string.Join(", ", profiles.Select(x => $"{x.Attributes.Name} ({x.Attributes.ProfileState})"))}");
+            }
             // var errorMessage = string.Join('\n', profiles.Select(x => $"- {x.Attributes.Name}"));
             // Assert.NotEmpty(profiles, $"No Active Profiles found:\n{profiles}");
 
