@@ -43,8 +43,10 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
             var profiles = profileResponse.Data.Where(x =>
                     x.Attributes.ProfileState == ProfileState.ACTIVE && x.Id == Apple_ProfileId)
                 .ToArray();
-            var errorMessage = string.Join('\n', profiles.Select(x => $"- {x.Attributes.Name}"));
-            Assert.NotEmpty(profiles, $"No Active Profiles found:\n{profiles}");
+            if(!profiles.Any())
+                Assert.Fail($"Profiles:\n{string.Join('\n', profiles.Select(x => $"- {x.Attributes.Name} ({x.Attributes.ProfileState})"))}");
+            // var errorMessage = string.Join('\n', profiles.Select(x => $"- {x.Attributes.Name}"));
+            // Assert.NotEmpty(profiles, $"No Active Profiles found:\n{profiles}");
 
             foreach (var profile in profiles)
             {
