@@ -39,6 +39,7 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
         .Executes(() =>
         {
             var profileResponse = GetProvisioningProfiles();
+            Assert.NotEmpty(profileResponse.Data, "No Provisioning Profiles found.");
             var profiles = profileResponse.Data.Where(x =>
                     x.Attributes.ProfileState == ProfileState.ACTIVE && x.Id == Apple_ProfileId)
                 .ToArray();
