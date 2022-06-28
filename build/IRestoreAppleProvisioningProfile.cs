@@ -30,6 +30,7 @@ public interface IRestoreAppleProvisioningProfile : INukeBuild
     string Apple_ProfileId => TryGetValue(() => Apple_ProfileId);
 
     Target DownloadProvisioningProfile => _ => _
+        .OnlyWhenStatic(() => EnvironmentInfo.Platform == PlatformFamily.OSX)
         .TryBefore<IRestore>()
         .TryBefore<IHazMauiWorkload>()
         .Requires(() => Apple_IssuerId)

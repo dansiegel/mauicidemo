@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
+using Nuke.Common.Utilities.Collections;
 using Nuke.Components;
+using Serilog;
 
 [PublicAPI]
 public interface IHazIOSCertificate : INukeBuild
@@ -21,6 +24,7 @@ public interface IHazIOSCertificate : INukeBuild
     AbsolutePath P12CertifiatePath => (AbsolutePath) Path.Combine(EnvironmentInfo.WorkingDirectory, "apple.p12");
 
     Target RestoreIOSCertificate => _ => _
+        .OnlyWhenStatic(() => EnvironmentInfo.Platform == PlatformFamily.OSX)
         .TryBefore<IRestore>()
         .TryBefore<IHazMauiWorkload>()
         .Requires(() => IOS_P12_B64)
@@ -32,6 +36,15 @@ public interface IHazIOSCertificate : INukeBuild
 
             // security import certificate.pfx -k ~/Library/Keychains/login.keychain -P \$tup1dP@ssw0rd
             var escaped = IOS_P12_Password.StartsWith("$") ? '\\' + IOS_P12_Password : IOS_P12_Password;
-            Security.Invoke($"import {P12CertifiatePath} -k -k ~/Library/Keychains/login.keychain -P {escaped}");
+
+            try
+            {
+                Security.Invoke($"import {P12CertifiatePath} -k /Library/Keychains/System.keychain -P {escaped}");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error Encountered by Security Tool");
+                Assert.Fail("Unable to import p12 into the keychain");
+            }
         });
 }
