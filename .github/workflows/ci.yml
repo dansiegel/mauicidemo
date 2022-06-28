@@ -5,7 +5,7 @@ on:
 
 jobs:
   android:
-    runs-on: macos-12
+    runs-on: windows-latest
     name: Android App CI
     steps:
       - uses: actions/checkout@v2
@@ -55,6 +55,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: apple-actions/import-codesign-certs@master
+        with:
+          p12-file-base64: ${{ secrets.IOS_P12_B64 }}
+          p12-password: ${{ secrets.IOS_P12_PASSWORD }}
+
+      - uses: apple-actions/download-provisioning-profiles@master
+        with:
+          bundle-id: com.avantipoint.mauicidemo
+          profile-type: IOS_APP_DEVELOPMENT
+          issuer-id: ${{ secrets.Apple_IssuerId }}
+          api-key-id: ${{ secrets.Apple_KeyId }}
+          api-private-key: ${{ secrets.APPLE_AUTH_KEY_P8_TEXT }}
+
       - name: Setup .NET 6.0.x
         uses: actions/setup-dotnet@v2
         with:
@@ -65,3 +78,7 @@ jobs:
 
       - name: NuGet Restore
         run: dotnet restore MauiCIDemo.sln
+
+      - name: Publish
+        run: |
+          dotnet publish -f:net6.0-ios -c:Release --output publish
