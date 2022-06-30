@@ -36,9 +36,6 @@ class Build : NukeBuild,
 
     const string MasterBranch = "master";
 
-    [CI]
-    readonly GitHubActions GitHubActions;
-
     protected override void WriteLogo()
     {
         Debug();

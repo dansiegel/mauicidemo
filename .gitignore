@@ -9,3 +9,6 @@
 
 .nuke/temp/
 .idea/
+.vs/
+
+*.csproj.user

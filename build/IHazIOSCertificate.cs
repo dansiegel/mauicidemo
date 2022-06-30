@@ -39,9 +39,15 @@ public interface IHazIOSCertificate : INukeBuild
 
             try
             {
-                Security.Invoke($"import {P12CertifiatePath} -k /Library/Keychains/System.keychain -P {escaped}");
+                var keychainPath = TemporaryDirectory / "app-signing.keychain-db";
+                Security.Invoke($"create-keychain -p \"p@55word\" {keychainPath}");
+                Security.Invoke($"set-keychain-settings -lut 21600 {keychainPath}");
+                Security.Invoke($"unlock-keychain -p \"p@55word\" {keychainPath}");
+
+                Security.Invoke($"import {P12CertifiatePath} -k {keychainPath} -P {escaped}");
+                Security.Invoke($"list-keychain -d user -s {keychainPath}");
             }
-            catch (Exception e)
+            catch
             {
                 Log.Error("Error Encountered by Security Tool");
                 Assert.Fail("Unable to import p12 into the keychain");
