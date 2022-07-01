@@ -17,11 +17,12 @@ public interface IHazAndroidKeystore : INukeBuild
     [Parameter("Android KeyStore must be provided"), Secret]
     string Android_Keystore_Password => TryGetValue(() => Android_Keystore_Password);
 
-    AbsolutePath KeystorePath => (AbsolutePath) Path.Combine(EnvironmentInfo.WorkingDirectory, $"{Android_Keystore_Name}.keystore");
+    AbsolutePath KeystorePath => (AbsolutePath) Path.Combine(TemporaryDirectory, $"{Android_Keystore_Name}.keystore");
 
     Target RestoreKeystore => _ => _
         .TryBefore<IRestore>()
         .TryBefore<IHazMauiWorkload>()
+        .Unlisted()
         .Requires(() => Android_Keystore_B64)
         .Requires(() => Android_Keystore_Name)
         .Requires(() => Android_Keystore_Password)

@@ -33,6 +33,7 @@ public interface IHazIOSBuild :
                     .AddProperty("ArchiveOnBuild", true)
                     .AddProperty("ApplicationDisplayVersion", Versioning.NuGetPackageVersion)
                     .AddProperty("ApplicationVersion", buildVersion)
+                    .AddProperty("PublishTrimmed", false)
                     .SetOutput(ArtifactsDirectory));
         });
 }
