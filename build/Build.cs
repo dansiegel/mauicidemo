@@ -35,7 +35,7 @@ public class DemoBuild : CIBuild
             {
                 new AndroidJob(),
                 new DemoIOSJob(),
-                new AzureSignedWindowsJob()
+                WindowsJob.AzureSigned,
             }
         }
     };
@@ -51,17 +51,5 @@ public class DemoIOSJob : iOSJob
         nameof(IRestoreAppleProvisioningProfile.AppleKeyId),
         nameof(IRestoreAppleProvisioningProfile.AppleAuthKeyP8),
         nameof(IRestoreAppleProvisioningProfile.AppleProfileId)
-    };
-}
-
-public class AzureSignedWindowsJob : WindowsJob
-{
-    public override SecretImportCollection ImportSecrets => new()
-    {
-        nameof(IWinUICodeSign.AzureKeyVault),
-        nameof(IWinUICodeSign.AzureKeyVaultCertificate),
-        nameof(IWinUICodeSign.AzureKeyVaultClientId),
-        nameof(IWinUICodeSign.AzureKeyVaultClientSecret),
-        nameof(IWinUICodeSign.AzureKeyVaultTenantId),
     };
 }
