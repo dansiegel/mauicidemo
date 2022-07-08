@@ -1,60 +1,67 @@
-using System.Reflection;
-using Nuke.Common;
-using Nuke.Common.CI;
+using System;
+using System.Collections.Generic;
+using AvantiPoint.Nuke.Maui;
+using AvantiPoint.Nuke.Maui.Apple;
+using AvantiPoint.Nuke.Maui.CI;
+using AvantiPoint.Nuke.Maui.CI.GitHubActions;
+using AvantiPoint.Nuke.Maui.Windows;
 using Nuke.Common.CI.GitHubActions;
-using Nuke.Common.Utilities.Collections;
+using Nuke.Common.Tools.NerdbankGitVersioning;
 
-[GitHubActions("android-build",
-    GitHubActionsImage.WindowsLatest,
-    FetchDepth = 0,
-    AutoGenerate = true,
-    OnPushBranches = new [] { MasterBranch },
-    InvokedTargets = new [] { nameof(IHazAndroidBuild.CompileAndroid) },
-    ImportSecrets = new [] { nameof(IHazAndroidKeystore.Android_Keystore_Name), nameof(IHazAndroidKeystore.Android_Keystore_B64), nameof(IHazAndroidKeystore.Android_Keystore_Password)}
-    )]
-[GitHubActions("ios-build",
-    GitHubActionsImage.MacOsLatest,
-    FetchDepth = 0,
-    AutoGenerate = true,
-    OnPushBranches = new [] { MasterBranch },
-    InvokedTargets = new [] { nameof(IHazIOSBuild.CompileIos) },
-    ImportSecrets = new []
-    {
-        nameof(IHazIOSCertificate.IOS_P12_B64),
-        nameof(IHazIOSCertificate.IOS_P12_Password),
-        nameof(IRestoreAppleProvisioningProfile.Apple_IssuerId),
-        nameof(IRestoreAppleProvisioningProfile.Apple_KeyId),
-        nameof(IRestoreAppleProvisioningProfile.Apple_AuthKey_P8),
-        nameof(IRestoreAppleProvisioningProfile.Apple_ProfileId)
-    }
-)]
-class Build : NukeBuild,
-    IHazAndroidBuild,
-    IHazIOSBuild
+[GitHubWorkflow(typeof(DemoBuild))]
+class Build : MauiBuild
 {
-    public static int Main () => Execute<Build>(x => ((IHazAndroidBuild)x).CompileAndroid);
+    public static int Main() => Execute<Build>();
 
-    const string MasterBranch = "master";
+    public GitHubActions GitHubActions => GitHubActions.Instance;
 
-    protected override void WriteLogo()
+    [NerdbankGitVersioning]
+    readonly NerdbankGitVersioning NerdbankVersioning;
+
+    public override string ApplicationDisplayVersion => NerdbankVersioning.SimpleVersion;
+    public override long ApplicationVersion => IsLocalBuild ?
+        (DateTimeOffset.Now.ToUnixTimeSeconds() - new DateTimeOffset(2022, 7, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeSeconds()) / 60 :
+        GitHubActions.RunNumber;
+}
+
+public class DemoBuild : CIBuild
+{
+    public override PushTrigger OnPush => "master";
+    public override IEnumerable<ICIStage> Stages => new[]
     {
-        Debug();
-        new[]
+        new CIStage
         {
-            "░█████╗░██╗░░░██╗░█████╗░███╗░░██╗████████╗██╗██████╗░░█████╗░██╗███╗░░██╗████████╗",
-            "██╔══██╗██║░░░██║██╔══██╗████╗░██║╚══██╔══╝██║██╔══██╗██╔══██╗██║████╗░██║╚══██╔══╝",
-            "███████║╚██╗░██╔╝███████║██╔██╗██║░░░██║░░░██║██████╔╝██║░░██║██║██╔██╗██║░░░██║░░░",
-            "██╔══██║░╚████╔╝░██╔══██║██║╚████║░░░██║░░░██║██╔═══╝░██║░░██║██║██║╚████║░░░██║░░░",
-            "██║░░██║░░╚██╔╝░░██║░░██║██║░╚███║░░░██║░░░██║██║░░░░░╚█████╔╝██║██║░╚███║░░░██║░░░",
-            "╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚══╝░░░╚═╝░░░╚═╝╚═╝░░░░░░╚════╝░╚═╝╚═╝░░╚══╝░░░╚═╝░░░",
-        }.ForEach(x => Debug(x));
-        Debug();
-    }
+            Jobs = new ICIJob[]
+            {
+                new AndroidJob(),
+                new DemoIOSJob(),
+                new AzureSignedWindowsJob()
+            }
+        }
+    };
+}
 
-    private void Debug(string text = null)
+public class DemoIOSJob : iOSJob
+{
+    public override SecretImportCollection ImportSecrets => new()
     {
-        var hostType = typeof(Nuke.Common.Host);
-        var method = hostType.GetMethod("Debug", BindingFlags.Static | BindingFlags.NonPublic);
-        method.Invoke(null, new[] {text});
-    }
+        { nameof(IHazAppleCertificate.P12B64), "IOS_P12_B64" },
+        { nameof(IHazAppleCertificate.P12Password), "IOS_P12_PASSWORD" },
+        nameof(IRestoreAppleProvisioningProfile.AppleIssuerId),
+        nameof(IRestoreAppleProvisioningProfile.AppleKeyId),
+        nameof(IRestoreAppleProvisioningProfile.AppleAuthKeyP8),
+        nameof(IRestoreAppleProvisioningProfile.AppleProfileId)
+    };
+}
+
+public class AzureSignedWindowsJob : WindowsJob
+{
+    public override SecretImportCollection ImportSecrets => new()
+    {
+        nameof(IWinUICodeSign.AzureKeyVault),
+        nameof(IWinUICodeSign.AzureKeyVaultCertificate),
+        nameof(IWinUICodeSign.AzureKeyVaultClientId),
+        nameof(IWinUICodeSign.AzureKeyVaultClientSecret),
+        nameof(IWinUICodeSign.AzureKeyVaultTenantId),
+    };
 }

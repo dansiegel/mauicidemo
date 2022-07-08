@@ -6,44 +6,68 @@
     "build": {
       "type": "object",
       "properties": {
-        "Android_Keystore_B64": {
+        "AndroidKeystoreB64": {
           "type": "string",
           "description": "Android KeyStore must be Base64 Encoded",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "Android_Keystore_Name": {
+        "AndroidKeystoreName": {
           "type": "string",
           "description": "Android KeyStore name must be provided",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "Android_Keystore_Password": {
+        "AndroidKeystorePassword": {
           "type": "string",
           "description": "Android KeyStore must be provided",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "Apple_AuthKey_P8": {
+        "AppleAuthKeyP8": {
           "type": "string",
           "description": "Apple AuthKey P8 text value",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "Apple_IssuerId": {
+        "AppleIssuerId": {
           "type": "string",
           "description": "Apple Issuer Id is required",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "Apple_KeyId": {
+        "AppleKeyId": {
           "type": "string",
           "description": "Apple Key Id is required",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "Apple_ProfileId": {
+        "AppleProfileId": {
           "type": "string",
           "description": "Apple Profile Id is required",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
+        "AzureKeyVault": {
+          "type": "string",
+          "description": "The Azure KeyVault Uri",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
+        "AzureKeyVaultCertificate": {
+          "type": "string",
+          "description": "The name of the Code Sign certificate in the Azure Key Vault",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
+        "AzureKeyVaultClientId": {
+          "type": "string",
+          "description": "The Azure AD Client Id to connect to the Azure Key Vault",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
+        "AzureKeyVaultClientSecret": {
+          "type": "string",
+          "description": "The Azure AD Client Secret to connect to the Azure Key Vault",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
+        "AzureKeyVaultTenantId": {
+          "type": "string",
+          "description": "The Azure AD Tenant Id",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
         "Configuration": {
           "type": "string",
-          "description": "Configuration to build - Default is 'Debug' (local) or 'Release' (server)",
           "enum": [
             "Debug",
             "Release"
@@ -52,6 +76,16 @@
         "Continue": {
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
+        },
+        "DigestAlgorithm": {
+          "type": "string",
+          "description": "The Signing Algorithm, i.e. sha1, sha256, sha384, sha512. Defaults to sha256",
+          "enum": [
+            "SHA1",
+            "SHA256",
+            "SHA384",
+            "SHA512"
+          ]
         },
         "Help": {
           "type": "boolean",
@@ -78,27 +112,44 @@
             "VSCode"
           ]
         },
-        "IgnoreFailedSources": {
-          "type": "boolean",
-          "description": "Ignore unreachable sources during Restore"
+        "InputFilePath": {
+          "type": "string"
         },
-        "IOS_P12_B64": {
+        "Linker": {
           "type": "string",
-          "description": "iOS P12 Certificate must be Base64 Encoded",
-          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
-        },
-        "IOS_P12_Password": {
-          "type": "string",
-          "description": "iOS P12 Certificate must be provided",
-          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+          "enum": [
+            "Full",
+            "None",
+            "SdkOnly"
+          ]
         },
         "NoLogo": {
           "type": "boolean",
           "description": "Disables displaying the NUKE logo"
         },
+        "P12B64": {
+          "type": "string",
+          "description": "P12 Certificate must be Base64 Encoded",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
+        "P12Password": {
+          "type": "string",
+          "description": "P12 Certificate must be provided",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
         "Partition": {
           "type": "string",
           "description": "Partition to use on CI"
+        },
+        "PfxB64": {
+          "type": "string",
+          "description": "Base 64 Encoded PFX for code signing the Windows MSIX",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
+        "PfxPassword": {
+          "type": "string",
+          "description": "The password for the Windows signing Certificate",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Plan": {
           "type": "boolean",
@@ -111,6 +162,10 @@
             "type": "string"
           }
         },
+        "ProjectName": {
+          "type": "string",
+          "description": "The name of the MAUI Single Project to build"
+        },
         "Root": {
           "type": "string",
           "description": "Root directory during build execution"
@@ -121,9 +176,15 @@
           "items": {
             "type": "string",
             "enum": [
+              "CleanArtifacts",
+              "CodeSignMsix",
               "CompileAndroid",
               "CompileIos",
+              "CompileMacCatalyst",
+              "CompileWindows",
               "DownloadProvisioningProfile",
+              "EncodeFile",
+              "GenerateJwt",
               "InstallWorkload",
               "Restore",
               "RestoreIOSCertificate",
@@ -141,9 +202,15 @@
           "items": {
             "type": "string",
             "enum": [
+              "CleanArtifacts",
+              "CodeSignMsix",
               "CompileAndroid",
               "CompileIos",
+              "CompileMacCatalyst",
+              "CompileWindows",
               "DownloadProvisioningProfile",
+              "EncodeFile",
+              "GenerateJwt",
               "InstallWorkload",
               "Restore",
               "RestoreIOSCertificate",
